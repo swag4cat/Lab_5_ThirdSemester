@@ -18,8 +18,19 @@ $(TARGET): $(SRC)
 run: $(TARGET)
 	./$(TARGET)
 
+# Generate documentation
+doc:
+	doxygen Doxyfile
+
 # Clean build files
 clean:
 	rm -f $(TARGET)
 
-.PHONY: all run clean
+# Clean documentation
+clean-doc:
+	rm -rf docs
+
+# Clean everything
+distclean: clean clean-doc
+
+.PHONY: all run doc clean clean-doc distclean

@@ -1,9 +1,23 @@
+/**
+ * @file main.cpp
+ * @brief Cave Generator using Cellular Automata
+ * @details Implementation of cave generation algorithm for Lab 5
+ */
+
 #include <SFML/Graphics.hpp>
 #include <iostream>
 #include <vector>
 #include <random>
 #include <algorithm>
 #include <string>
+
+/**
+ * @class CaveGenerator
+ * @brief Cellular automata for cave generation
+ *
+ * Implements the cave generation algorithm using cellular automata rules.
+ * Cells can be alive (true) or dead (false) based on neighbor counts.
+ */
 
 class CaveGenerator {
 private:
@@ -12,6 +26,13 @@ private:
     double birthChance;
     int birthLimit;
     int deathLimit;
+
+    /**
+     * @brief Count alive neighbors around a cell
+     * @param x X coordinate of the cell
+     * @param y Y coordinate of the cell
+     * @return Number of alive neighbors (0-8)
+     */
 
     int countAliveNeighbors(int x, int y) {
         int count = 0;
@@ -33,11 +54,25 @@ private:
     }
 
 public:
+
+    /**
+     * @brief Constructor for CaveGenerator
+     * @param w Width of the cave
+     * @param h Height of the cave
+     * @param chance Birth chance probability (0.0-1.0)
+     * @param birth Birth limit for new cells
+     * @param death Death limit for existing cells
+     */
+
     CaveGenerator(int w, int h, double chance, int birth, int death)
     : width(w), height(h), birthChance(chance), birthLimit(birth), deathLimit(death) {
         cave.resize(width, std::vector<bool>(height, false));
         initializeCave();
     }
+
+    /**
+     * @brief Initialize cave with random cells based on birth chance
+     */
 
     void initializeCave() {
         std::random_device rd;
@@ -50,6 +85,14 @@ public:
             }
         }
     }
+
+    /**
+     * @brief Perform one iteration of cellular automata
+     *
+     * Applies the rules:
+     * - Alive cells die if neighbors < deathLimit
+     * - Dead cells become alive if neighbors > birthLimit
+     */
 
     void simulateStep() {
         std::vector<std::vector<bool>> newCave = cave;
@@ -94,6 +137,14 @@ public:
     }
 };
 
+/**
+ * @class GraphicsManager
+ * @brief Handles SFML graphics and user interface
+ *
+ * Manages the rendering window, user input, and visualization
+ * of the cave generation process.
+ */
+
 class GraphicsManager {
 private:
     sf::RenderWindow window;
@@ -105,6 +156,12 @@ private:
     CaveGenerator& caveGen;
 
 public:
+
+    /**
+     * @brief Constructor for GraphicsManager
+     * @param generator Reference to the CaveGenerator instance
+     */
+
     GraphicsManager(CaveGenerator& generator)
     : window(),
     font(),
@@ -151,6 +208,10 @@ public:
         cellSize = std::min(600 / caveWidth, 500 / caveHeight);
         if (cellSize < 3) cellSize = 3;
     }
+
+    /**
+     * @brief Main graphics loop
+     */
 
     void run() {
         while (window.isOpen()) {
@@ -279,21 +340,22 @@ private:
             infoText.setPosition(panelX, panelY + 40);
             window.draw(infoText);
         } else {
-            // Simple graphics if font not loaded
             drawInfoWithoutText(panelX, panelY);
         }
     }
 
     void drawInfoWithoutText(int x, int y) {
-        // Simple colored rectangles instead of text
         sf::RectangleShape iterationBox(sf::Vector2f(200, 20));
         iterationBox.setPosition(x, y + 40);
         iterationBox.setFillColor(sf::Color::Blue);
         window.draw(iterationBox);
-
-        // Add more shapes for different info...
     }
 };
+
+/**
+ * @brief Main function
+ * @return Exit status
+ */
 
 int main() {
     int width, height;
